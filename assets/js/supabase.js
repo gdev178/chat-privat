@@ -1,6 +1,6 @@
 // GANTI DENGAN KREDENSIAL SUPABASE ANDA
-const SUPABASE_URL = 'https://YOUR_PROJECT_REF.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+const SUPABASE_URL = 'https://nipypmjnektcpwqscfaw.supabase.co';
+const SUPABASE_ANON_KEY = 'MASUKKAN_ANON_KEY_ANDA_DISINI';
 
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
