@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Live Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            700: '#243b53',
+                            800: '#102a43',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-navy-900 text-white flex-shrink-0 flex flex-col justify-between">
+            <div>
+                <div class="p-5 border-b border-navy-800 flex items-center justify-between">
+                    <span class="font-bold text-lg tracking-wide text-white">ADMIN PANEL</span>
+                </div>
+                <nav class="p-4 space-y-1">
+                    <a href="#" id="nav-users" onclick="switchTab('users')" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg bg-blue-600 text-white transition">
+                        <span>Pengguna & Kode</span>
+                    </a>
+                    <a href="#" id="nav-chats" onclick="switchTab('chats')" class="flex items-center space-x-3 px-4 py-2.5 rounded-lg text-gray-300 hover:bg-navy-800 transition">
+                        <span>Pesan Chat</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-navy-800">
+                <div class="flex items-center justify-between">
+                    <span id="adminName" class="text-sm font-medium truncate text-gray-300">Admin</span>
+                    <button onclick="logout()" class="text-xs bg-red-600/20 text-red-400 hover:bg-red-600/40 px-2.5 py-1.5 rounded transition">Keluar</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col min-w-0 bg-white">
+            <!-- TAB: USERS -->
+            <div id="tab-users" class="flex-1 p-6 overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Kelola Pengguna</h1>
+                        <p class="text-sm text-gray-500">Buat akun pengguna dan atur kode akses</p>
+                    </div>
+                    <button onclick="openCreateUserModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition">
+                        + Tambah Pengguna
+                    </button>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-600 uppercase">
+                                <th class="p-4">Nama</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4">Dibuat</th>
+                                <th class="p-4 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody" class="divide-y divide-gray-200 text-sm">
+                            <tr><td colspan="4" class="p-4 text-center text-gray-400">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: CHATS -->
+            <div id="tab-chats" class="flex-1 flex overflow-hidden hidden">
+                <!-- Chat Sidebar (User list) -->
+                <div class="w-80 border-r border-gray-200 flex flex-col bg-gray-50">
+                    <div class="p-4 border-b border-gray-200 font-semibold text-gray-700">Daftar Chat</div>
+                    <div id="chatUserList" class="flex-1 overflow-y-auto divide-y divide-gray-200">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+                <!-- Chat Window -->
+                <div class="flex-1 flex flex-col bg-white">
+                    <div id="chatHeader" class="p-4 border-b border-gray-200 font-semibold text-gray-800 bg-gray-50 flex items-center justify-between">
+                        <span id="activeChatUser">Pilih pengguna untuk mulai chat</span>
+                    </div>
+                    <div id="messagesContainer" class="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50">
+                        <div class="text-center text-gray-400 text-sm mt-10">Belum ada percakapan dipilih</div>
+                    </div>
+                    <div class="p-3 border-t border-gray-200 flex gap-2 bg-white">
+                        <input type="text" id="messageInput" disabled placeholder="Ketik pesan..." class="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100">
+                        <button id="sendBtn" disabled onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Kirim</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Create User -->
+    <div id="createUserModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Tambah Pengguna Baru</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Nama Tampilan</label>
+                    <input type="text" id="newDisplayName" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500" placeholder="John Doe">
+                </div>
+                <button onclick="submitCreateUser()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium text-sm transition">Buat Pengguna & Kode</button>
+                <button onclick="closeModal('createUserModal')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 py-2 rounded-lg font-medium text-sm transition">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Show Code -->
+    <div id="showCodeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-xl text-center">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Kode Akses Pengguna</h3>
+            <p class="text-sm text-gray-500 mb-4">Salin kode di bawah dan berikan ke pengguna untuk login.</p>
+            <div id="generatedCodeDisplay" class="bg-gray-100 border border-dashed border-gray-300 rounded-lg py-3 px-4 text-xl font-mono font-bold text-blue-600 mb-4 tracking-wider">
+                -
+            </div>
+            <button onclick="copyCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium text-sm transition mb-2">Salin Kode</button>
+            <button onclick="closeModal('showCodeModal')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 py-2 rounded-lg font-medium text-sm transition">Tutup</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>
